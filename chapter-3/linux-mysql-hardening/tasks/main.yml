@@ -1,0 +1,34 @@
+# tasks file for linux-mysql-hardening
+- name: gather facts
+  setup:
+
+- name: delete anonymous mysql user for localhost
+  mysql_user:
+    user: ""
+    state: absent
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+- name: secure mysql root user
+  mysql_user:
+    user: "root"
+    password: "{{ mysql_root_password }}"
+    host: "{{ item }}"
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+  with_items:
+    - 127.0.0.1
+    - localhost
+    - ::1
+    - "{{ ansible_fqdn }}"
+
+- name: removes mysql test database
+  mysql_db:
+    db: test
+    state: absent
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+  notify:
+    - restart mysql

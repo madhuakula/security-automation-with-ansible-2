@@ -1,0 +1,57 @@
+- name: OWASP Dependency Check Playbook
+  hosts: scanner
+  remote_user: ubuntu
+  become: yes
+  vars:
+    repo_url: https://github.com/psiinon/bodgeit.git
+    output_dir: /tmp/bodgeit/
+    project_name: bodgeit
+    report_name: report.html
+  
+  tasks:
+    - name: installing pre requisuites
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+
+      with_items:
+        - git
+        - unzip
+        - mono-runtime
+        - mono-devel
+        - default-jre
+
+    - name: downloading owasp dependency-check
+      unarchive:
+        src: http://dl.bintray.com/jeremy-long/owasp/dependency-check-3.0.2-release.zip
+        dest: /usr/share/
+        remote_src: yes
+    
+    - name: adding symlink to the system
+      file:
+        src: /usr/share/dependency-check/bin/dependency-check.sh
+        dest: /usr/bin/dependency-check
+        mode: 0755
+        state: link
+    
+    - name: cloning the {{ repo_url }}
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ output_dir }}"
+    
+    - name: updating CVE database
+      command: "dependency-check --updateonly"
+
+    - name: OWASP dependency-check scanning in action
+      # Output available in XML, HTML, CSV, JSON, VULN, ALL formats
+      command: "dependency-check --project {{ project_name }} --scan {{ output_dir }} -o {{ output_dir }}{{ project_name }}-report.html"
+    
+    - name: Downloading the report
+      fetch:
+        src: "{{ output_dir }}{{ project_name }}-report.html"
+        dest: "{{ report_name }}"
+        flat: yes
+
+    - debug:
+        msg: "Report can be found at {{ report_name }}"

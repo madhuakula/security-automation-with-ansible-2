@@ -1,0 +1,29 @@
+- name: installing python-pip
+  apt:
+    name: python-pip
+    update_cache: yes
+    state: present
+
+- name: install python requests
+  pip:
+    name: requests
+
+- name: setting up autonessus
+  get_url:
+    url: "https://github.com/redteamsecurity/AutoNessus/raw/master/autoNessus.py"
+    dest: /usr/bin/autoNessus
+    mode: 0755
+  
+- name: updating the credentials
+  replace:
+    path: /usr/bin/autoNessus
+    regexp: "{{ item.src }}"
+    replace: "{{ item.dst }}"
+    backup: yes
+  no_log: True
+  
+  with_items:
+    - { src: "token = ''", dst: "token = '{{ nessus_user_token }}'" }
+    - { src: "url = 'https://localhost:8834'", dst: "url = '{{ nessus_url }}'" }
+    - { src: "username = 'xxxxx'", dst: "username = '{{ nessus_user_name }}'" }
+    - { src: "password = 'xxxxx'", dst: "password = '{{ nessus_user_password }}'" }

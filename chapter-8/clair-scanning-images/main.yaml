@@ -1,0 +1,25 @@
+- name: Scanning containers using clair-scanner
+  hosts: docker
+  remote_user: ubuntu
+  become: yes
+  vars:
+    image_to_scan: "debian:sid"  #container to scan for vulnerabilities
+    clair_server: "http://192.168.1.10:6060"  #clair server api endpoint
+  
+  tasks:
+    - name: downloading and setting up clair-scanner binary
+      get_url:
+        url: https://github.com/arminc/clair-scanner/releases/download/v6/clair-scanner_linux_amd64
+        dest: /usr/local/bin/clair-scanner
+        mode: 0755
+    
+    - name: scanning {{ image_to_scan }} container for vulnerabilities
+      command: "clair-scanner -r /tmp/{{ image_to_scan }}-scan-report.json -c {{ clair_server }} --ip 0.0.0.0 {{ image_to_scan }}"
+      register: scan_output
+      ignore_errors: yes
+    
+    - name: downloading the report locally
+      fetch:
+        src: /tmp/{{ image_to_scan }}-scan-report.json
+        dest: ./{{ image_to_scan }}-scan-report.json
+        flat: yes

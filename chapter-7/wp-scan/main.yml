@@ -1,0 +1,32 @@
+- name: WPScan Playbook
+  hosts: localhost
+  vars:
+    domain_name: www.idontexistdomainnamewebsite.com # Specify the domain to scan
+    wpscan_container: wpscanteam/wpscan
+    scan_name: wpscan
+    output_dir: /tmp # Specify the output directory to store results
+  
+  tasks:
+    # This playbook assumes docker already installed
+    - name: Downloading {{ wpscan_container }} docker container
+      docker_image:
+        name: "{{ wpscan_container }}"
+
+    - name: creating output report file
+      file:
+        path: "{{output_dir }}/{{ domain_name }}.txt"
+        state: touch
+
+    - name: Scanning {{ domain_name }} website using WPScan
+      docker_container:
+        name: "{{ scan_name }}"
+        image: "{{ wpscan_container }}"
+        interactive: yes
+        auto_remove: yes
+        state: started
+        volumes: "/tmp/{{ domain_name }}.txt:/wpscan/data/output.txt"
+        command: ["--update", "--follow-redirection", "--url", "{{ domain_name }}", "--log", "/wpscan/data/output.txt"]
+    
+    - name: WPScan report downloaded
+      debug:
+        msg: "The report can be found at /tmp/{{ domain_name }}.txt"

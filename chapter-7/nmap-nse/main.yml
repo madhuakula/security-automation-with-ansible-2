@@ -1,0 +1,15 @@
+- name: Advanced NMAP Scan using NSE
+  hosts: localhost
+  vars:
+    ports:
+      - 80
+      - 443
+    scan_host: scanme.nmap.org 
+
+  tasks:
+    - name: Running Nmap NSE scan
+      shell: "nmap -Pn -p {{ ports|join(',') }} --script {{ item }} -oA nmap-{{ item }}-results-%Y-%m-%d {{ scan_host }}"
+
+      with_items:
+        - http-methods
+        - http-enum

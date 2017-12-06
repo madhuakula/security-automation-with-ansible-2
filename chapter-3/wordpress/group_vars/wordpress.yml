@@ -1,0 +1,35 @@
+# COMMON
+remote_user_name: ubuntu
+
+# NGINX ROLE
+website_domain_name: security-hardening-with-ansible2.com
+
+# MYSQL ROLE
+mysql_root_password: randompassword
+wordpress_database_name: automation
+wordpress_mysql_username: chapmion
+wordpress_mysql_user_password: doublerandompassword
+
+# WORDPRESS ROLE
+wordpress_system_user: ubuntu
+wordpress_site_title: "Security Automation with Ansible"
+wordpress_admin_user: hodor
+wordpress_admin_user_password: strongpassword
+wordpress_admin_email: wordpress@localhost.local
+wordpress_site_home_directory: /var/www/html
+
+# CERTBOT ROLE
+website_domain_name: security-hardening-with-ansible2.com
+cerbot_service_admin_email: emailid@domain.com
+
+# DUPLY ROLE
+duply_bakup_name: wpsite
+gpg_key: 12ABE2DE
+gpg_key_password: superstrongpass
+target_s3_location: s3://s3-us-west-2.amazonaws.com/backupfiles/site/
+aws_access_key: pleaseupdate
+aws_secret_access_key: pleaseupdatethis
+source_backup_location: /var/www/html
+max_backup_age: 1M
+max_full_backups: 1
+max_full_backup_age: 1M

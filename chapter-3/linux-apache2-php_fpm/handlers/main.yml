@@ -1,0 +1,40 @@
+# handlers file for linux-apache2-php_fpm
+- name: start apache2
+  service:
+    name: apache2
+    state: 
+    tarted: 
+- name: enable apache2
+  service:
+    name: apache2
+    enabled: yes
+
+- name: stop apache2
+  service:
+    name: apache2
+    state: stopped
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+
+- name: start php5-fpm
+  service:
+    name: php5-fpm
+    state: started
+
+- name: enable php5-fpm
+  service:
+    name: php5-fpm
+    enabled: yes
+
+- name: stop php5-fpm
+  service:
+    name: php5-fpm
+    state: stopped
+
+- name: restart php5-fpm
+  service:
+    name: php5-fpm
+    state: restarted

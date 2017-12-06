@@ -1,0 +1,27 @@
+- name: set mysql root password
+  debconf:
+    name: mysql-server
+    question: mysql-server/root_password
+    value: "{{ mysql_root_password | quote }}"
+    vtype: password
+
+- name: confirm mysql root password
+  debconf: 
+    name: mysql-server
+    question: mysql-server/root_password_again
+    value: "{{ mysql_root_password | quote }}"
+    vtype: password
+
+- name: install mysqlserver
+  apt: name="{{ item }}" state=present
+  
+  with_items:
+   - mysql-server
+   - mysql-client
+   - python-mysqldb
+
+  notify:
+    - enable mysql
+    - start mysql
+
+- include: wordpress-db-user-setup.yml

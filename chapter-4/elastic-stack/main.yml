@@ -1,0 +1,12 @@
+- name: setting up elastic stack on ubuntu 16.04
+  hosts: elastic-stack
+  remote_user: "{{ remote_user_login_name }}"
+  become: yes
+  gather_facts: no
+
+  roles:
+    - common
+    - elasticsearch
+    - logstash
+    - kibana
+    - nginx-reverse-proxy

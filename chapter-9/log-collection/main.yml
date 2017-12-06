@@ -1,0 +1,28 @@
+# Reference https://www.ansible.com/security-automation-with-ansible
+
+- name: Gather log files
+  hosts: servers
+  become: yes
+
+  tasks:
+    - name: List files to grab
+      find:
+        paths:
+          - /var/log
+        patterns:
+          - '*.log*'
+        recurse: yes
+      register: log_files
+
+    - name: Creating log directory
+      file:
+        state: directory
+        path: /tmp/LOGS_{{ ansible_fqdn }}
+      delegate_to: localhost
+      become: no
+
+    - name: Grab files
+      fetch:
+        src: "{{ item.path }}"
+        dest: "/tmp/LOGS_{{ ansible_fqdn }}/"
+      with_items: "{{ log_files.files }}"

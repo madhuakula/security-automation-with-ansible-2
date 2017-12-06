@@ -1,0 +1,26 @@
+- name: installing php
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+
+  with_items:
+    - php-fpm
+    - php-mysql
+    - php-curl
+    - php-gd
+    - php-mbstring
+    - php-mcrypt
+    - php-xml
+    - php-xmlrpc
+
+- name: update the php configuration
+  lineinfile:
+    path: /etc/php/7.0/fpm/php.ini
+    line: 'cgi.fix_pathinfo=0'
+  
+- name: add php-fpm to start up and restart
+  service:
+    name: php7.0-fpm
+    enabled: yes
+    state: restarted

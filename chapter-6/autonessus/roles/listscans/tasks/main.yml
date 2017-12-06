@@ -1,0 +1,6 @@
+- name: list current scans and IDs using autoNessus
+  command: "autoNessus -l"
+  register: list_scans_output
+
+- debug:
+    msg: "{{ list_scans_output.stdout_lines }}"

@@ -1,0 +1,30 @@
+- name: installing apache2 server
+  apt:
+    name: apache2
+    update_cache: yes
+    state: present
+
+- name: updating customized templates for apache2 configuration
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    mode: 0644
+
+  with_tems:
+    - { src: 'apache2.conf.j2', dst: '/etc/apache2/conf.d/apache2.conf' }
+    - { src: '000-default.conf.j2', dst: '/etc/apache2/sites-available/000-default.conf' }
+    - { src: 'default-ssl.conf.j2', dst: '/etc/apache2/sites-available/default-ssl.conf' }
+
+- name: adding custom link for sites-enabled from sites-available
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+    
+  with_items:
+    - { src: '/etc/apache2/sites-available/000-default.conf', dest: '/etc/apache2/sites-enabled/000-default.conf' }
+    - { src: '/etc/apache2/sites-available/default-ssl.conf', dest: '/etc/apache2/sites-enabled/default-ssl.conf' }
+
+  notify:
+    - start apache2
+    - startup apache2

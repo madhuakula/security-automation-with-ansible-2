@@ -1,0 +1,10 @@
+- name: configuring packetbeat.yml file
+  template:
+    src: "{{ item.src }}"
+    dest: "/etc/packetbeat/{{ item.dst }}"
+
+  with_items:
+    - { src: 'packetbeat.yml.j2', dst: 'packetbeat.yml' }
+
+  notify:
+    - restart packetbeat

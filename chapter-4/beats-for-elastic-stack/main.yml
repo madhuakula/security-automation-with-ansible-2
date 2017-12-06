@@ -1,0 +1,11 @@
+- name: setting up elastic beats on ubuntu 16.04
+  hosts: monitor
+  remote_user: ubuntu
+  become: yes
+  vars:
+    logstash_server_ip: "192.168.56.102"
+
+  roles:
+    - filebeat
+    - packetbeat
+    - metricbeat

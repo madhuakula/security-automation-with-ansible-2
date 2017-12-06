@@ -1,0 +1,23 @@
+service: automated-defence
+
+stage: dev
+region: us-east-1
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  iamRoleStatements:
+    $ref: ./iamRoleStatements.json
+
+functions:
+  blacklist:
+    handler: handler.blacklistip
+    events:
+     - http:
+         path: blacklistip
+         method: get
+         
+  handleexpiry:
+    handler: handler.handleexpiry
+    events:
+     - schedule: rate(1 minute)

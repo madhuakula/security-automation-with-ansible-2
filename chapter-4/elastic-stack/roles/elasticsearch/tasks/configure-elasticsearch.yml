@@ -1,0 +1,19 @@
+- name: creating elasticsearch backup repo directory at {{ elasticsearch_backups_repo_path }}
+  file:
+    path: "{{ elasticsearch_backups_repo_path }}"
+    state: directory
+    mode: 0755
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: configuring elasticsearch.yml file
+  template:
+    src: "{{ item.src }}"
+    dest: /etc/elasticsearch/"{{ item.dst }}"
+
+  with_items:
+    - { src: 'elasticsearch.yml.j2', dst: 'elasticsearch.yml' }
+    - { src: 'jvm.options.j2', dst: 'jvm.options' }
+
+  notify:
+    - restart elasticsearch

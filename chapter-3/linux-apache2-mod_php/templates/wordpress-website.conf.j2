@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+	ServerName {{ server_domain_name_or_ip }}
+	ServerAdmin {{ server_admin_email }}
+	DocumentRoot {{ website_root_directory }}
+
+	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+	# error, crit, alert, emerg.
+	# It is also possible to configure the loglevel for particular
+	# modules, e.g.
+	#LogLevel info ssl:warn
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>

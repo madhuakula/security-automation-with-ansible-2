@@ -1,0 +1,2 @@
+- include: install-filebeat.yml
+- include: configure-filebeat.yml

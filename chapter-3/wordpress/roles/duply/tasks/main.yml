@@ -1,0 +1,32 @@
+- name: installing duply
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+
+  with_items:
+    - python-boto
+    - duply
+
+- name: chcek if we have generated a config already
+  stat:
+    path: "/home/{{ wordpress_system_user }}/.duply/{{ duply_bakup_name }}"
+  register: duply_dir_stats
+
+- name: create backup directories
+  shell: "duply {{ duply_bakup_name }} create"
+  become: "{{ wordpress_system_user }}"
+  when: duply_dir_stats.stat.exists == False
+
+- name: copy configurations
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+  
+  with_items:
+    - { src: conf, dest: "/home/{{ wordpress_system_user }}/.duply/{{ duply_bakup_name }}/conf" }
+    - { src: exclude, dest: "/home/{{ wordpress_system_user }}/.duply/{{ duply_bakup_name }}/exclude" }
+    - { src: gpgkey.pub.asc, dest: "/home/{{ wordpress_system_user }}/.duply/{{ duply_bakup_name }}/gpgkey.{{ gpg_key }}.pub.asc" }
+    - { src: gpgkey.sec.asc, dest: "/home/{{ wordpress_system_user }}/.duply/{{ duply_bakup_name }}/gpgkey.{{ gpg_key }}.sec.asc" }

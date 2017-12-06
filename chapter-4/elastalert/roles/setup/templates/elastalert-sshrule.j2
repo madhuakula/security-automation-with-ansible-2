@@ -1,0 +1,26 @@
+es_host: localhost
+es_port: 9200
+name: "SSH Bruteforce attack alert"
+type: frequency
+index: filebeat-*
+num_events: 20
+timeframe:
+  minutes: 1
+
+# For more info: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html
+
+filter:
+- query:
+    query_string:
+      query: '_type:sshlog AND login:failed AND (username: "ubuntu" OR username: "root")'
+
+alert:
+  - slack:
+      slack_webhook_url: "https://hooks.slack.com/services/xxxxx"
+      slack_username_override: "attack-bot"
+      slack_emoji_override: "robot_face"
+
+  - command: ["/usr/bin/curl", "https://xxxxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev/zzzzzzzzzzzzzz/ip/inframonitor/%(ip)s"]
+
+realert:
+  minutes: 0

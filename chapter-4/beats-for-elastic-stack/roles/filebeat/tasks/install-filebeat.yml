@@ -1,0 +1,27 @@
+- name: adding elastic gpg key for filebeat
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+
+- name: adding the elastic repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
+    state: present
+
+- name: installing filebeat
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - apt-transport-https
+    - filebeat
+
+- name: adding filebeat to the startup programs
+  service:
+    name: filebeat
+    enabled: yes
+
+  notify:
+   - start filebeat

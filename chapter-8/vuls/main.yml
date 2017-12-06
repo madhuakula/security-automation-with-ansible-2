@@ -1,0 +1,7 @@
+- name: setting up vuls using docker containers
+  hosts: vuls
+  become: yes
+
+  roles:
+    - vuls_containers_download
+    - vuls_database_download

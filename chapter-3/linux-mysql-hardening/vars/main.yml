@@ -1,0 +1,2 @@
+# tasks file for linux-mysql-hardening
+mysql_root_password: "mysqlrootpassword"

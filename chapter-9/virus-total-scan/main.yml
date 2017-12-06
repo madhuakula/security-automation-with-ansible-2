@@ -1,0 +1,42 @@
+- name: scanning file in VirusTotal
+  hosts: malware
+  remote_user: ubuntu
+  vars:
+    vt_api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    vt_api_type: public # public/private
+    vt_intelligence_access: False # True/False
+    files_in_local_system: /tmp/samples/
+    files_in_remote_system: /tmp/sample-file/
+
+  tasks:
+    - name: creating samples directory
+      file:
+        path: "{{ files_in_remote_system }}"
+        state: directory
+
+    - name: copying file to remote system
+      copy:
+        src: "{{ files_in_local_system }}"
+        dest: "{{ files_in_remote_system }}"
+        directory_mode: yes
+    
+    - name: copying configuration
+      template:
+        src: config.j2
+        dest: "{{ files_in_remote_system }}/.vtapi"
+
+    - name: running VirusTotal scan
+      command: "vt -fr {{ files_in_remote_system }}"
+      args:
+        chdir: "{{ files_in_remote_system }}"
+      register: vt_scan
+    
+    - name: removing the samples
+      file:
+        path: "{{ files_in_remote_system }}"
+        state: absent
+
+    - name: VirusTotal scan results
+      debug:
+        msg: "{{ vt_scan.stdout_lines }}"
+    

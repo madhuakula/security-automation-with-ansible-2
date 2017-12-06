@@ -1,0 +1,13 @@
+- name: logstash configuration files 
+  template:
+    src: "{{ item.src }}"
+    dest: /etc/logstash/conf.d/"{{ item.dst }}"
+
+  with_items:
+    - { src: '02-beats-input.conf.j2', dst: '02-beats-input.conf' }
+    - { src: '10-sshlog-filter.conf.j2', dst: '10-sshlog-filter.conf' }
+    - { src: '11-weblog-filter.conf.j2', dst: '11-weblog-filter.conf' }
+    - { src: '30-elasticsearch-output.conf.j2', dst: '10-elasticsearch-output.conf' }
+
+  notify:
+    - restart logstash

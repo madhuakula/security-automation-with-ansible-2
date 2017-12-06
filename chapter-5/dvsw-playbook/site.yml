@@ -1,0 +1,21 @@
+- name: setting up DVWS container
+  hosts: dvsw
+  remote_user: ubuntu
+  gather_facts: no
+  become: yes
+  vars:
+    dvws_image_name: cyrivs89/web-dvws
+
+  tasks:
+    - name: pulling {{ dvws_image_name }} container
+      docker_image:
+        name: "{{ dvws_image_name }}"
+
+    - name: running dvws container
+      docker_container:
+        name: dvws
+        image: "{{ dvws_image_name }}"
+        interactive: yes
+        state: started
+        ports:
+          - "80:80"

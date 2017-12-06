@@ -1,0 +1,16 @@
+- name: adding virtualbox apt source
+  apt_repository:
+    repo: "deb http://download.virtualbox.org/virtualbox/debian xenial contrib"
+    filename: 'virtualbox'
+    state: present
+
+- name: adding virtualbox apt key
+  apt_key:
+    url: "https://www.virtualbox.org/download/oracle_vbox_2016.asc"
+    state: present
+
+- name: install virtualbox
+  apt:
+    name: virtualbox-5.1
+    state: present
+    update_cache: yes

@@ -1,0 +1,20 @@
+- name: Basic NMAP Scan Playbook
+  hosts: localhost
+  gather_facts: false
+  vars:
+    top_ports: 1000
+    network_hosts:
+        - 192.168.1.1
+        - scanme.nmap.org
+        - 127.0.0.1
+
+  tasks:
+    - name: check if nmap installed and install
+      apt:
+        name: nmap
+        update_cache: yes
+        state: present
+      become: yes
+
+    - name: top ports scan
+      shell: "nmap --top-ports {{ top_ports }} -Pn -oA nmap-scan-%Y-%m-%d {{ network_hosts|join('  ') }}"

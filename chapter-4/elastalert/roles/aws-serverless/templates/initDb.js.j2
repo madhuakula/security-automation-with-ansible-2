@@ -1,0 +1,78 @@
+var config = require('./config.js')
+
+var AWS = require("aws-sdk")
+AWS.config.update({
+  region: config.region
+});
+
+var dynamodb = new AWS.DynamoDB();
+
+var params = {
+   "AttributeDefinitions": [ 
+      { 
+         "AttributeName": "id",
+         "AttributeType": "N"
+      },
+      { 
+         "AttributeName": "ip",
+         "AttributeType": "S"
+      },
+      { 
+         "AttributeName": "expirymin",
+         "AttributeType": "N"
+      }      
+   ],
+   "GlobalSecondaryIndexes": [ 
+      { 
+         "IndexName": "ip_index",
+         "KeySchema": [ 
+            { 
+               "AttributeName": "ip",
+               "KeyType": "HASH"
+            }
+         ],
+         "Projection": { 
+            "ProjectionType": "ALL"
+         },
+         "ProvisionedThroughput": { 
+            "ReadCapacityUnits": 100,
+            "WriteCapacityUnits": 100
+         }         
+      },
+      { 
+         "IndexName": "expirymin_index",
+         "KeySchema": [ 
+            { 
+               "AttributeName": "expirymin",
+               "KeyType": "HASH"
+            }
+         ],
+         "Projection": { 
+            "ProjectionType": "ALL"
+         },
+         "ProvisionedThroughput": { 
+            "ReadCapacityUnits": 100,
+            "WriteCapacityUnits": 100
+         } 
+      }
+   ],
+   "KeySchema": [ 
+      { 
+         "AttributeName": "id",
+         "KeyType": "HASH"
+      }
+   ],
+   "ProvisionedThroughput": { 
+      "ReadCapacityUnits": 100,
+      "WriteCapacityUnits": 100
+   },
+   "TableName": config.tableName
+}
+
+dynamodb.createTable(params, function(err, data) {
+    if (err) {
+        console.error("Unable to create table. Error JSON:", JSON.stringify(err, null, 2));
+    } else {
+        console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+    }
+});

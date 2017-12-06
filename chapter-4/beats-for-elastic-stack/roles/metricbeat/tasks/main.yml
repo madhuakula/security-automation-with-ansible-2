@@ -1,0 +1,2 @@
+- include: install-metricbeat.yml
+- include: configure-metricbeat.yml

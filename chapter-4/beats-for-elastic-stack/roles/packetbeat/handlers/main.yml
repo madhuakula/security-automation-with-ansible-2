@@ -1,0 +1,9 @@
+- name: start packetbeat
+  service:
+    name: packetbeat
+    state: started
+
+- name: restart packetbeat
+  service:
+    name: packetbeat
+    state: restarted

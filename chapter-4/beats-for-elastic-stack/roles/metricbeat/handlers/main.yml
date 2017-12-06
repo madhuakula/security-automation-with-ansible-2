@@ -1,0 +1,9 @@
+- name: start metricbeat
+  service:
+    name: metricbeat
+    state: started
+
+- name: restart metricbeat
+  service:
+    name: metricbeat
+    state: restarted

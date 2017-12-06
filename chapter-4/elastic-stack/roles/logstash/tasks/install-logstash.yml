@@ -1,0 +1,26 @@
+- name: adding elastic gpg key for logstash
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+
+- name: adding the elastic repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
+    state: present
+  
+- name: installing logstash 
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - logstash
+
+- name: adding logstash to the startup programs
+  service:
+    name: logstash
+    enabled: yes  
+  
+  notify:
+   - start logstash

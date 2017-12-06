@@ -1,0 +1,13 @@
+- name: Windows Audit Playbook
+  hosts: winblows
+
+  tasks:
+    - name: download audit script
+      win_get_url:
+        url: https://raw.githubusercontent.com/alanrenouf/Windows-Workstation-and-Server-Audit/master/Audit.ps1
+        dest: C:\Audit.ps1
+
+    - name: running windows audit script
+      win_shell: C:\Audit.ps1
+      args:
+        chdir: C:\

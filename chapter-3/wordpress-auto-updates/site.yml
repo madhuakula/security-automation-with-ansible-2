@@ -1,0 +1,48 @@
+- name: wordpress core, themes and plugins auto update
+  remote_user: ubuntu
+  hosts: wordpress
+  gather_facts: False
+  become: True
+  vars:
+    wordpress_system_user: ubuntu
+    wordpress_site_home_directory: /var/www/html
+
+  tasks:
+    - name: ensure backup completed
+      command: /etc/cron.hourly/duply-backup
+
+    - name: updating wordpress core
+      command: wp core update
+      args:
+        chdir: "{{ wordpress_site_home_directory }}"
+      become: "{{ wordpress_system_user }}"
+      register: wp_core_update_output
+      ignore_errors: yes
+
+    - name: wp core update output
+      debug:
+        msg: "{{ wp_core_update_output.stdout }}"
+
+    - name: updating wordpress themes
+      command: wp theme update --all
+      args:
+        chdir: "{{ wordpress_site_home_directory }}"
+      become: "{{ wordpress_system_user }}"      
+      register: wp_theme_update_output
+      ignore_errors: yes
+
+    - name: wp themes update output
+      debug:
+        msg: "{{ wp_theme_update_output.stdout }}"
+
+    - name: updating wordpress plugins
+      command: wp plugin update --all
+      args:
+        chdir: "{{ wordpress_site_home_directory }}"
+      become: "{{ wordpress_system_user }}"      
+      register: wp_plugin_update_output
+      ignore_errors: yes
+
+    - name: wp plugins update output
+      debug:
+        msg: "{{ wp_plugin_update_output.stdout }}"

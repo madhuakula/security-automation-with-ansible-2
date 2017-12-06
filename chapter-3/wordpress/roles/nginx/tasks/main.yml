@@ -1,0 +1,30 @@
+- name: installing nginx server
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  
+  with_items:
+    - nginx
+
+- name: configuring site files
+  template:
+    src: website.conf
+    dest: /etc/nginx/sites-available/{{ website_domain_name }}
+
+- name: removing default symlink of nginx
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: adding symlink for sites 
+  file:
+    src: "/etc/nginx/sites-available/{{ website_domain_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ website_domain_name }}"
+    state: link
+
+- name: adding nginx to startup and restart
+  service:
+    name: nginx
+    enabled: yes
+    state: restarted

@@ -1,0 +1,32 @@
+- name: copying the setup scripts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0755
+  
+  with_items:
+    - { src: "yara.sh", dest: "/tmp/yara.sh" }
+    - { src: "ssdeep.sh", dest: "/tmp/ssdeep.sh" }
+
+- name: downloading ssdeep and yara releases
+  unarchive:
+    src: "{{ item }}"
+    dest: /tmp/
+    remote_src: yes
+
+  with_items:
+    - https://github.com/plusvic/yara/archive/v3.4.0.tar.gz
+    - https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz
+
+- name: installing yara and ssdeep
+  shell: "{{ item }}"
+  ignore_errors: yes
+
+  with_items:
+    - /tmp/yara.sh
+    - /tmp/ssdeep.sh
+
+- name: installing M2Crypto
+  pip:
+    name: m2crypto
+    version: 0.24.0

@@ -1,0 +1,37 @@
+- name: Running OWASP ZAP Baseline Scan
+  hosts: zap
+  remote_user: ubuntu
+  gather_facts: no
+  become: yes
+  vars:
+    owasp_zap_image_name: owasp/zap2docker-weekly
+    website_url: http://192.168.33.111
+    reports_location: /zapdata
+    scan_name: owasp-zap-base-line-scan-dvws
+
+  tasks:
+    - name: adding write permissions to reports directory
+      file:
+        path: "{{ reports_location }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+        mode: 0770
+
+    - name: running owasp zap baseline scan container against "{{ website_url }}"
+      docker_container:
+        name: "{{ scan_name }}"
+        image: "{{ owasp_zap_image_name }}"
+        interactive: yes
+        auto_remove: yes
+        state: started
+        volumes: "{{ reports_location }}:/zap/wrk:rw"
+        command: "zap-baseline.py -t {{ website_url }} -r {{ scan_name }}_report.html"
+    
+    - name: getting raw output of the scan
+      raw: "docker logs -f {{ scan_name }}"
+      register: scan_output
+
+    - debug:
+        msg: "{{ scan_output }}"

@@ -1,0 +1,44 @@
+- name: anchore-cli scan
+  hosts: anchore
+  become: yes
+  vars:
+    scan_image_name: "docker.io/library/ubuntu:latest"
+    anchore_vars:
+      ANCHORE_CLI_URL: http://localhost:8228/v1
+      ANCHORE_CLI_USER: admin
+      ANCHORE_CLI_PASS: secretpassword
+
+  tasks:
+    - name: installing anchore-cli
+      pip:
+        name: "{{ item }}"
+
+      with_items:
+        - anchorecli
+        - pyyaml
+    
+    - name: downloading image
+      command: "docker pull {{ scan_image_name }}"
+
+    - name: adding image for analysis
+      command: "anchore-cli image add {{ scan_image_name }}"
+      environment: "{{anchore_vars}}"
+    
+    - name: wait for analysis to compelte
+      command: "anchore-cli image content {{ scan_image_name }} os"
+      register: analysis
+      until: analysis.rc != 1
+      retries: 10
+      delay: 30
+      ignore_errors: yes
+      environment: "{{anchore_vars}}"
+
+    - name: vulnerabilities results
+      command: "anchore-cli image vuln {{ scan_image_name }} os"
+      register: vuln_output
+      environment: "{{anchore_vars}}"
+    
+    - name: "vulnerabilities in {{ scan_image_name }}"
+      debug:
+        msg: "{{ vuln_output.stdout_lines }}"
+      

@@ -1,0 +1,45 @@
+- name: anchore server setup
+  hosts: anchore
+  become: yes
+  vars:
+    db_password: changeme
+    admin_password: secretpassword
+
+  tasks:
+    - name: creating volumes
+      file:
+        path: "{{ item }}"
+        recurse: yes
+        state: directory
+      
+      with_items:
+        - /root/aevolume/db
+        - /root/aevolume/config
+      
+    - name: copying anchore-engine configuration
+      template:
+        src: config.yaml.j2
+        dest: /root/aevolume/config/config.yaml
+
+    - name: starting anchore-db container
+      docker_container:
+        name: anchore-db
+        image: postgres:9
+        volumes:
+          - "/root/aevolume/db/:/var/lib/postgresql/data/pgdata/"
+        env:
+          POSTGRES_PASSWORD: "{{ db_password }}"
+          PGDATA: "/var/lib/postgresql/data/pgdata/"
+
+    - name: starting anchore-engine container
+      docker_container:
+        name: anchore-engine
+        image: anchore/anchore-engine
+        ports:
+          - 8228:8228
+          - 8338:8338
+        volumes:
+          - "/root/aevolume/config/config.yaml:/config/config.yaml:ro"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        links:
+          - anchore-db:anchore-db

@@ -1,0 +1,9 @@
+- name: pulling containers locally
+  docker_image:
+    name: "{{ item }}"
+    pull: yes
+  
+  with_items:
+    - vuls/go-cve-dictionary
+    - vuls/goval-dictionary
+    - vuls/vuls

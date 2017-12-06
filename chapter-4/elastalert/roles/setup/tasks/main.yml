@@ -1,0 +1,43 @@
+- name: installing pre requsuites for elastalert
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - libssl-dev
+    - python-setuptools
+    - build-essential
+
+- name: installing elastalert
+  pip:
+    name: elastalert
+
+- name: creating elastalert directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+
+  with_items:
+    - /opt/elastalert/rules
+    - /opt/elastalert/config
+
+- name: creating elastalert configuration
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+
+  with_items:
+    - { src: 'elastalert-config.j2', dst: '/opt/elastalert/config/config.yml' }
+    - { src: 'elastalert-service.j2', dst: '/lib/systemd/system/elastalert.service' }
+    - { src: 'elastalert-sshrule.j2', dst: '/opt/elastalert/rules/ssh-bruteforce.yml' }
+    
+- name: enable elastalert service
+  service:
+    name: elastalert
+    state: started
+    enabled: yes

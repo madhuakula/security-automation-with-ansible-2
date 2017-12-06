@@ -1,0 +1,53 @@
+# tasks file for linux-apache2-php_fpm
+- name: installing apache2 and php_fpm
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+
+  with_items:
+    - apache2
+    - php5-fpm
+    - php5-mysql
+    - php5-mcrypt
+    - php5-gd
+    - php5-curl
+
+- name: disable the default.conf 
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+
+- name: adding site, apache2 and php5-fpm cofiguration for website
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+
+  with_items:
+    - { src: "wordpress-website.conf.j2", dest: "/etc/apache2/sites-available/wordpress-website.conf" }
+    - { src: "apache2.conf.j2", dest: "/etc/apache2/apache2.conf" }
+ 
+- name: enabling the configuration
+  file:
+    src: /etc/apache2/sites-available/wordpress-website.conf
+    dest: /etc/apache2/sites-enabled/wordpress-website.conf
+    state: link
+
+- name: adding directory permissions and ownership
+  file:
+    path: "{{ website_root_directory }}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: enable php5-fpm for starting on boot
+  service:
+    name: php5-fpm
+    enabled: yes
+    state: started
+  
+- name: enable apache2 for starting on boot
+  service:
+    name: apache2
+    enabled: yes
+    state: started

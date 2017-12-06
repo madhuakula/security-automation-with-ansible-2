@@ -1,0 +1,8 @@
+- name: installing nessus server
+  hosts: nessus
+  remote_user: "{{ remote_user_name }}"
+  gather_facts: no
+  become: yes
+
+  roles:
+    - setup

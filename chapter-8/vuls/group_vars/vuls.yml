@@ -1,0 +1,9 @@
+vuls_data_directory: "/vuls_data"
+nvd_database_years: 2017
+redhat_oval_versions:
+  - 6
+  - 7
+ubuntu_oval_versions:
+  - 12
+  - 14
+  - 16

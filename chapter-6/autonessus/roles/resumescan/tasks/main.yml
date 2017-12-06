@@ -1,0 +1,6 @@
+- name: resume nessus scan "{{ scan_id }}" using autoNessus
+  command: "autoNessus -sR {{ scan_id }}"
+  register: resume_scan_output
+
+- debug:
+    msg: "{{ resume_scan_output.stdout_lines }}"

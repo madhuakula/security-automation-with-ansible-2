@@ -1,0 +1,26 @@
+- name: adding elastic gpg key for packetbeat
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+
+- name: adding the elastic repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
+    state: present
+  
+- name: installing packetbeat 
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - packetbeat
+
+- name: adding packetbeat to the startup programs
+  service:
+    name: packetbeat
+    enabled: yes
+  
+  notify:
+   - start packetbeat

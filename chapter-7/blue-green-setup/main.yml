@@ -1,0 +1,32 @@
+- name: running common role
+  hosts: prod
+  gather_facts: false
+  become: yes
+  serial: 100%
+  roles:
+    - common
+
+- name: running haproxy role
+  hosts: proxyserver
+  become: yes  
+  roles:
+    - haproxy
+
+- name: running webserver role
+  hosts: webservers
+  become: yes  
+  serial: 100%  
+  roles:
+    - nginx
+
+- name: updating blue code
+  hosts: blue
+  become: yes  
+  roles:
+    - bluecode
+
+- name: updating green code
+  hosts: green
+  become: yes  
+  roles:
+    - greencode

@@ -1,0 +1,6 @@
+- name: pausing nessus scan "{{ scan_id }}" using autoNessus
+  command: "autoNessus -pS {{ scan_id }}"
+  register: pause_scan_output
+
+- debug:
+    msg: "{{ pause_scan_output.stdout_lines }}"

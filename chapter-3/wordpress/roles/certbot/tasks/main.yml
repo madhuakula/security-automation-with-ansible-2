@@ -1,0 +1,14 @@
+- name: adding certbot ppa
+  apt_repository:
+    repo: "ppa:certbot/certbot"
+
+- name: install certbot
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  
+  with_items:
+    - python-certbot-nginx
+
+- include: generate-certs.yml

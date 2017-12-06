@@ -1,0 +1,38 @@
+- name: fetching NVD database locally
+  docker_container:
+    name: "cve-{{ item }}"
+    image: vuls/go-cve-dictionary
+    auto_remove: yes
+    interactive: yes
+    state: started
+    command: fetchnvd -years "{{ item }}"
+    volumes:
+      - "{{ vuls_data_directory }}:/vuls"
+      - "{{ vuls_data_directory }}/go-cve-dictionary-log:/var/log/vuls"
+  with_sequence: start=2002 end="{{ nvd_database_years }}"
+
+- name: fetching redhat oval data
+  docker_container:
+    name: "redhat-oval-{{ item }}"
+    image: vuls/goval-dictionary
+    auto_remove: yes
+    interactive: yes
+    state: started
+    command: fetch-redhat "{{ item }}"
+    volumes:
+      - "{{ vuls_data_directory }}:/vuls"
+      - "{{ vuls_data_directory }}/goval-dictionary-log:/var/log/vuls"
+  with_items: "{{ redhat_oval_versions }}"
+
+- name: fetching ubuntu oval data
+  docker_container:
+    name: "ubuntu-oval-{{ item }}"
+    image: vuls/goval-dictionary
+    auto_remove: yes
+    interactive: yes
+    state: started
+    command: "fetch-ubuntu {{ item }}"
+    volumes:
+      - "{{ vuls_data_directory }}:/vuls"
+      - "{{ vuls_data_directory }}/goval-dictionary-log:/var/log/vuls"
+  with_items: "{{ ubuntu_oval_versions }}"

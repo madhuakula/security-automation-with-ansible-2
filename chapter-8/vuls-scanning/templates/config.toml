@@ -1,0 +1,11 @@
+[slack]
+hookURL = "{{ slack_web_hook_url}}"
+channel = "{{ slack_channel }}"
+iconEmoji = "{{ slack_emoji }}"
+
+[servers]
+
+[servers.{{ server_key_file_name }}]
+host = "{{ server_to_scan }}"
+user = "{{ server_username }}"
+keyPath = "/root/.ssh/{{ server_key_file_name }}"

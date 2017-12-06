@@ -1,0 +1,27 @@
+#---------- ANSIBLE PLAYBOOK CONFIGURATION -------
+
+remote_user_login_name: "ubuntu"
+
+
+#---------- NGINX REVERSE PROXY CONFIGURATION ----
+
+basic_auth_username: "elkadmin"
+basic_auth_password: "elkadmin"
+
+
+#---------- ELASTICSEARCH CONFIGURATION ----------
+
+elasticsearch_cluster_name: "elastic-stack"
+elasticsearch_node_name: "node1"
+elasticsearch_network_host_address: "127.0.0.1"
+elasticsearch_backups_repo_path: "/var/backups/elasticsearch"
+
+
+elasticsearch_jvm_heap_Xms: "Xms1g"
+elasticsearch_jvm_heap_Xmx: "Xmx1g"
+
+#---------- LOGSTASH CONFIGURATION ---------------
+logstash_server_domain_name: "example.com"
+
+
+#---------- KIBANA CONFIGURATION -----------------

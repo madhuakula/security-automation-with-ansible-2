@@ -1,0 +1,4 @@
+nessus_user_token: ""
+nessus_user_name: "bbbbbbb" # Must required
+nessus_user_password: "ccccccc" # Must required
+nessus_url: "https://localhost:8834"

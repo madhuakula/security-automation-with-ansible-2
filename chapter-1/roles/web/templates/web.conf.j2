@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+
+	ServerAdmin {{server_admin_email}}
+	DocumentRoot {{server_document_root}}
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>

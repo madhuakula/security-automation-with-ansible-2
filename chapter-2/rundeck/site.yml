@@ -1,0 +1,30 @@
+- name: installing rundeck on ubuntu 16.04
+  hosts: "192.168.1.7"
+  remote_user: ubuntu
+  gatherfacts: False
+  become: yes
+
+  tasks:
+    - name: installing python2 minimal
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+    - name: java and curl installation
+      apt: name={{ item }} state=present update_cache=yes
+
+      with_items:
+        - curl
+        - openjdk-8-jdk
+
+    - name: downloading and installing rundeck deb package
+      apt:
+        deb: "http://dl.bintray.com/rundeck/rundeck-deb/rundeck-2.8.4-1-GA.deb"
+
+    - name: updating the hostname in configuration
+      template:  
+        src: rundeck-config.properties.j2
+        dest: /etc/rundeck/rundeck-config.properties
+        
+    - name: add to startup and start rundeck
+      service:
+        name: rundeckd
+        state: started

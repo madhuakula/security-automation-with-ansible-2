@@ -1,0 +1,19 @@
+GPG_KEY={{ gpg_key }}
+GPG_PW={{ gpg_key_password }}
+
+TARGET={{ target_s3_location }}
+
+export AWS_ACCESS_KEY_ID={{ aws_access_key }}
+export AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
+
+SOURCE={{ source_backup_location }}
+
+MAX_AGE={{ max_backup_age }}
+
+MAX_FULL_BACKUPS={{ max_full_backups }}
+
+MAX_FULLBKP_AGE={{ max_full_backup_age }}
+DUPL_PARAMS="$DUPL_PARAMS --full-if-older-than $MAX_FULLBKP_AGE " 
+
+VOLSIZE=250
+DUPL_PARAMS="$DUPL_PARAMS --volsize $VOLSIZE "

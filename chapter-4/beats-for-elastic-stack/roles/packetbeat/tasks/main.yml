@@ -1,0 +1,2 @@
+- include: install-packetbeat.yml
+- include: configure-packetbeat.yml

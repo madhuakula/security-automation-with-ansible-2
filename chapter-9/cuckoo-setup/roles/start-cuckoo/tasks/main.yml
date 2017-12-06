@@ -1,0 +1,20 @@
+- name: copying the configurationss
+  template:
+    src: "{{ item.src }}"
+    dest: "/root/.cuckoo/conf/{{ item.dest }}"
+  
+  with_items:
+    - { src: "cuckoo.conf", dest: "cuckoo.conf"}
+    - { src: "auxiliary.conf", dest: "auxiliary.conf"}
+    - { src: "virtualbox.conf", dest: "virtualbox.conf"}
+    - { src: "reporting.conf", dest: "reporting.conf"}
+
+- name: starting cuckoo server
+  command: cuckoo -d
+  ignore_errors: yes
+
+- name: starting cuckoo webserver
+  command: "cuckoo web runserver 0.0.0.0:8000"
+    args:
+      chdir: "/root/.cuckoo/web"
+  ignore_errors: yes

@@ -1,0 +1,24 @@
+- name: setting up osquery
+  hosts: linuxservers
+  become: yes
+
+  tasks:
+    - name: installing osquery
+      apt:
+        deb: https://pkg.osquery.io/deb/osquery_2.10.2_1.linux.amd64.deb
+        update_cache: yes
+    
+    - name: adding osquery configuration
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dst }}"
+      
+      with_items:
+        - { src: fim.conf, dst: /usr/share/osquery/packs/fim.conf }
+        - { src: osquery.conf, dst: /etc/osquery/osquery.conf }
+    
+    - name: starting and enabling osquery service
+      service:
+        name: osqueryd
+        state: started
+        enabled: yes

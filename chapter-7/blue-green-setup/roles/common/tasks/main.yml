@@ -1,0 +1,14 @@
+- name: installing python if not installed
+  raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- name: updating and installing git, curl
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  
+  with_items:
+    - git
+    - curl
+
+# Also we can include common any monitoring and security hardening tasks

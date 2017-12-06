@@ -1,0 +1,12 @@
+- name: install python 2
+  raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- name: downloading the package and installing
+  apt:
+    deb: "{{ nessus_download_url }}"
+
+- name: start the nessus daemon
+  service:
+    name: "nessusd"
+    enabled: yes
+    state: started

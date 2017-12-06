@@ -1,0 +1,45 @@
+- name: installing pre requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  
+  with_items:
+    - python
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - libssl-dev
+    - python-virtualenv
+    - python-setuptools
+    - libjpeg-dev
+    - zlib1g-dev
+    - swig
+    - tcpdump
+    - apparmor-utils
+    - mongodb
+    - unzip
+    - git
+    - volatility
+    - autoconf
+    - libtool
+    - libjansson-dev
+    - libmagic-dev
+    - postgresql
+    - volatility
+    - volatility-tools
+    - automake
+    - make
+    - gcc
+    - flex
+    - bison
+
+- name: setting capabilitites to tcpdump
+  capabilities:
+    path: /usr/sbin/tcpdump
+    capability: "{{ item }}+eip"
+    state: present
+  
+  with_items:
+    - cap_net_raw
+    - cap_net_admin

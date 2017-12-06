@@ -1,0 +1,2 @@
+- include: install-elasticsearch.yml
+- include: configure-elasticsearch.yml

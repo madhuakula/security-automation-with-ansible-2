@@ -1,0 +1,35 @@
+- name: backing up the log data
+  hosts: localhost
+  gather_facts: false
+  become: yes
+  vars:
+    s3_access_key: XXXXXXX # Use ansible-vault to encrypt
+    s3_access_secret: XXXXXXX # Use ansible-vault to encrypt
+    localfolder: /tmp/LOGS/ # Trailing slash is important
+    remotebucket: secretforensicsdatausingansible # This should be unique in s3
+
+  tasks:
+    - name: installing s3cmd if not installed
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      
+      with_items:
+        - python-magic
+        - python-dateutil
+        - s3cmd
+    
+    - name: create s3cmd config file
+      template:
+        src: s3cmd.j2
+        dest: /root/.s3cfg
+        owner: root
+        group: root
+        mode: 0640
+    
+    - name: make sure "{{ remotebucket }}" is avilable
+      command: "s3cmd mb s3://{{ remotebucket }}/ -c /root/.s3cfg"
+
+    - name: running the s3 backup to "{{ remotebucket }}"
+      command: "s3cmd sync {{ localfolder }} --preserve s3://{{ remotebucket }}/ -c /root/.s3cfg"

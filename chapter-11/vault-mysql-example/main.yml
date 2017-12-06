@@ -1,0 +1,8 @@
+- name: Installing MySQL server
+  hosts: mysql
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+
+  roles:
+    - mysqlsetup

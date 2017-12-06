@@ -1,0 +1,17 @@
+- name: htpasswd generation
+  #command: htpasswd -c /etc/nginx/htpasswd.users 
+  htpasswd:
+    path: "/etc/nginx/htpasswd.users"
+    name: "{{ basic_auth_username }}"
+    password: "{{ basic_auth_password }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: nginx virtualhost configuration
+  template:
+    src: "templates/nginxdefault.j2"
+    dest: "/etc/nginx/sites-available/default"
+
+  notify:
+    - restart nginx

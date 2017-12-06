@@ -1,0 +1,16 @@
+[proxyserver]
+proxy ansible_host=192.168.100.100 ansible_user=ubuntu ansible_password=vagrant
+
+[blue]
+blueserver ansible_host=192.168.100.10 ansible_user=ubuntu ansible_password=vagrant
+
+[green]
+greenserver ansible_host=192.168.100.20 ansible_user=ubuntu ansible_password=vagrant
+
+[webservers:children]
+blue
+green
+
+[prod:children]
+webservers
+proxyserver

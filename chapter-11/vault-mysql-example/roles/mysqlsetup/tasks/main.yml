@@ -1,0 +1,23 @@
+- name: set mysql root password
+  debconf:
+    name: mysql-server
+    question: mysql-server/root_password
+    value: "{{ mysql_root_password | quote }}"
+    vtype: password
+
+- name: confirm mysql root password
+  debconf: 
+    name: mysql-server
+    question: mysql-server/root_password_again
+    value: "{{ mysql_root_password | quote }}"
+    vtype: password
+
+- name: install mysqlserver
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  
+  with_items:
+   - mysql-server
+   - mysql-client

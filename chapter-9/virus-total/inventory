@@ -1,0 +1,2 @@
+[malware]
+192.168.33.21 ansible_host=192.168.33.21 ansible_user=ubuntu ansible_password=vagrant

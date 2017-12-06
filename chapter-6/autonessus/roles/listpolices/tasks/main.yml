@@ -1,0 +1,6 @@
+- name: list current policies using autoNessus
+  command: "autoNessus -p"
+  register: list_policies_output
+
+- debug:
+    msg: "{{ list_policies_output.stdout_lines }}"

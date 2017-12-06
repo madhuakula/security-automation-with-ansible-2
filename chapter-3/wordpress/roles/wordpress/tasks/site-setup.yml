@@ -1,0 +1,67 @@
+- name: adding "{{ wordpress_system_user }}" as owner for "{{ wordpress_site_home_directory }}"
+  file:
+    path: "{{ wordpress_site_home_directory }}"
+    state: directory
+    owner: "{{ wordpress_system_user }}"
+    group:  "{{ wordpress_system_user }}"
+
+- name: downloading wp-core
+  shell: wp core download
+  become: yes
+  become_user: "{{ wordpress_system_user }}"
+  args:
+    chdir: "{{ wordpress_site_home_directory }}"
+  # register: wp_core_output
+  ignore_errors: yes
+  # failed_when: "'already' in wp_core_output.stderr"
+
+- name: configure wp core setup
+  shell: wp core config --dbname="{{ wordpress_database_name }}" --dbuser="{{ wordpress_mysql_username }}" --dbpass={{ wordpress_mysql_user_password }}
+  become_user: "{{ wordpress_system_user }}"
+  args:
+    chdir: "{{ wordpress_site_home_directory }}"
+  ignore_errors: yes    
+
+- name: configure wp core
+  shell: wp core install --url="{{ website_domain_name }}" --title='"{{ wordpress_site_title }}"' --admin_user="{{ wordpress_admin_user }}" --admin_password="{{ wordpress_admin_user_password }}" --admin_email="{{ wordpress_admin_email }}"
+  become_user: "{{ wordpress_system_user }}"
+  args:
+    chdir: "{{ wordpress_site_home_directory }}"
+  ignore_errors: yes  
+
+- name: disable wordpress editor changes
+  lineinfile:
+    path: "{{ wordpress_site_home_directory }}/wp-config.php"
+    line: "{{ item }}"
+  
+  with_items:
+    - define('FS_METHOD', 'direct');
+    - define('DISALLOW_FILE_EDIT', true);
+
+- name: update the ownership permissions
+  file:
+    path: "{{ wordpress_site_home_directory }}"
+    recurse: yes
+    owner: "{{ wordpress_system_user }}"
+    group: www-data
+
+- name: updated the permissions
+  shell: find "{{ wordpress_site_home_directory }}" -type d -exec chmod g+s {} \;
+
+- name: update group permissions
+  file:
+    path: "{{ item }}"
+    mode: g+w
+    recurse: yes
+
+  with_items:
+    - "{{ wordpress_site_home_directory }}/wp-content"
+    - "{{ wordpress_site_home_directory }}/themes"
+    - "{{ wordpress_site_home_directory }}/plugins"
+  
+- name: updating file and directory permissions
+  shell: "{{ item }}"
+
+  with_items:
+    - find "{{ wordpress_site_home_directory }}" -type d -exec chmod 755 {} \;
+    - find "{{ wordpress_site_home_directory }}" -type f -exec chmod 644 {} \;

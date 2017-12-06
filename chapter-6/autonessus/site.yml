@@ -1,0 +1,14 @@
+- name: installing autonessus
+  hosts: nessus
+  remote_user: ubuntu
+  gather_facts: no
+  become: yes
+
+  roles:
+    - setup
+    - listpolices
+    - listscans
+    - startscan
+    - pausescan
+    - resumescan
+    - stopscan

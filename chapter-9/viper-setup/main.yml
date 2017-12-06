@@ -1,0 +1,8 @@
+- name: Setting up Viper - binary management and analysis framework
+  hosts: viper
+  remote_user: ubuntu
+  become: yes
+
+  roles:
+    - dependencies
+    - setup

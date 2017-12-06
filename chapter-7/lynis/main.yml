@@ -1,0 +1,44 @@
+- name: Lynis security audit playbook
+  hosts: lynis
+  remote_user: ubuntu
+  become: yes
+  vars:
+    # refer to https://packages.cisofy.com/community
+    code_name: xenial
+  
+  tasks:
+    - name: adding lynis repo key
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: C80E383C3DE9F082E01391A0366C67DE91CA5D5F
+        state: present
+
+    - name: installing apt-transport-https
+      apt:
+        name: apt-transport-https
+        state: present
+
+    - name: adding repo
+      apt_repository:
+        repo: "deb https://packages.cisofy.com/community/lynis/deb/ {{ code_name }} main"
+        state: present
+        filename: "cisofy-lynis"
+    
+    - name: installing lynis
+      apt:
+        name: lynis
+        update_cache: yes
+        state: present
+    
+    - name: audit scan the system
+      shell: lynis audit system > /tmp/lynis-output.log
+    
+    - name: downloading report locally
+      fetch:
+        src: /tmp/lynis-output.log
+        dest: ./{{ inventory_hostname }}-lynis-report-{{ ansible_date_time.date }}.log
+        flat: yes
+
+    - name: report location
+      debug:
+        msg: "Report can be found at ./{{ inventory_hostname }}-lynis-report-{{ ansible_date_time.date }}.log"

@@ -1,0 +1,24 @@
+- name: Clair Scanner Server Setup
+  hosts: docker
+  remote_user: ubuntu
+  become: yes
+  
+  tasks:
+    - name: setting up clair-db
+      docker_container:
+        name: clair_db
+        image: arminc/clair-db
+        exposed_ports:
+          - 5432
+
+    - name: setting up clair-local-scan
+      docker_container:
+        name: clair
+        image: arminc/clair-local-scan:v2.0.1
+        ports:
+          - "6060:6060"
+        links:
+          - "clair_db:postgres"
+
+    - debug:
+        msg: "It will take some time to update the CVE databasae"

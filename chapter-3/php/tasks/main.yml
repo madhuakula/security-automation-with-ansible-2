@@ -1,0 +1,41 @@
+- name: installing php
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - php5
+    - libapache2-mod-php5
+    - php5-fpm
+    - php5-mysql
+    
+- name: configuring php.ini for php processor
+  replace:
+    path: /etc/php5/fpm/php.ini
+    regex: ';cgi.fix_pathinfo=1'
+    replace: 'cgi.fix_pathinfo=0'
+    backup: yes
+
+- name: enable php fpm on startup
+  service:
+    name: 'php5-fpm'
+    enabled: yes
+
+- name: restart the php fpm service
+  service:
+    name: php5-fpm
+    state: restarted
+
+- name: update the nginx configuration to support php-fpm
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+
+  with_items:
+    - { src: "defautlt.conf.j2", dst: "/etc/nginx/conf.d/default.conf" }
+
+- name: restart the nginx
+  service:
+    name: nginx
+    state: restarted

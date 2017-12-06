@@ -1,0 +1,4 @@
+- name: adding code in green machine
+  template:
+    src: index.html
+    dest: /var/www/html/index.html

@@ -1,0 +1,46 @@
+- name: Brakeman Scanning Playbook
+  hosts: scanner
+  remote_user: ubuntu
+  become: yes
+  gather_facts: false
+  vars:
+    repo_url: https://github.com/OWASP/railsgoat.git
+    output_dir: /tmp/railsgoat/
+    report_name: report.html
+
+  tasks:
+    - name: installing ruby and git
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+
+      with_items:
+        - ruby-full
+        - git
+
+    - name: installing brakeman gem
+      gem:
+        name: brakeman
+        state: present
+    
+    - name: cloning the {{ repo_url }}
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ output_dir }}"
+    
+    - name: Brakeman scanning in action
+      # Output available in text, html, tabs, json, markdown and csv formats
+      command: "brakeman -p {{ output_dir }} -o {{ output_dir }}report.html"
+      # Error handling for brakeman output
+      failed_when: result.rc != 3
+      register: result
+    
+    - name: Downloading the report
+      fetch:
+        src: "{{ output_dir }}/report.html"
+        dest: "{{ report_name }}"
+        flat: yes
+
+    - debug:
+        msg: "Report can be found at {{ report_name }}"

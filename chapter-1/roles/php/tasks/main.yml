@@ -1,0 +1,18 @@
+- name: install php7
+  apt:
+    name: "{{ item }}"
+    state: present
+
+  with_items:
+    - php7.0-mysql
+    - php7.0-curl
+    - php7.0-json
+    - php7.0-cgi
+    - php7.0
+    - libapache2-mod-php7
+
+- name: restart apache2
+  service:
+    state: restarted
+    name: apache2
+    daemon_reload: yes

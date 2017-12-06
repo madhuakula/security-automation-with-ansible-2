@@ -1,0 +1,30 @@
+- name: Docker bench security playbook
+  hosts: docker
+  remote_user: ubuntu
+  become: yes
+  
+  tasks:
+    - name: make sure git installed
+      apt:
+        name: git
+        state: present
+
+    - name: download the docker bench security
+      git:
+        repo: https://github.com/docker/docker-bench-security.git
+        dest: /opt/docker-bench-security
+    
+    - name: running docker-bench-security scan
+      command: sh docker-bench-security.sh -l /tmp/output.log
+      args:
+        chdir: /opt/docker-bench-security/
+    
+    - name: downloading report locally
+      fetch:
+        src: /tmp/output.log
+        dest: ./{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log
+        flat: yes
+
+    - name: report location
+      debug:
+        msg: "Report can be found at ./{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log"

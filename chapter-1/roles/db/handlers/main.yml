@@ -1,0 +1,15 @@
+- name: start mysql
+  service:
+    state: started
+    name: mysql
+
+- name: stop mysql
+  service:
+    state: stopped
+    name: mysql
+
+- name: restart mysql
+  service:
+    state: restarted
+    name: mysql
+    daemon_reload: yes

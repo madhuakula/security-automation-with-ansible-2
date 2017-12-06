@@ -1,0 +1,182 @@
+const config = require('./config.js')
+const AWS = require('aws-sdk')
+
+var dynamodb = new AWS.DynamoDB();
+var ec2 = new AWS.EC2();
+const docClient = new AWS.DynamoDB.DocumentClient({region: config.region})
+var actoken = config.accessToken
+var aclLimit = config.aclLimit
+var ruleStartId = config.ruleStartId
+var ruleValidity = config.ruleValidity
+var aclID = config.aclId
+var table_name = config.tableName
+
+function sendResponse (res,statusCode,body){
+  const response = {
+  statusCode: statusCode,
+  body: body
+  }
+  res(null, response);  
+}
+
+function addACLRule (ip,ruleNo){
+  var params = {
+  CidrBlock: ip + "/32", 
+  Egress: false, 
+  NetworkAclId: aclID, 
+  Protocol: "-1", 
+  RuleAction: "deny", 
+  RuleNumber: ruleNo
+  };
+  ec2.createNetworkAclEntry(params, function(err, data) {
+    if (err) console.log(err, err.stack);
+    else     console.log(data);
+  });
+
+}
+
+function delACLRule (ruleNo){
+  var params = {
+  Egress: false, 
+  NetworkAclId: aclID, 
+  RuleNumber: ruleNo
+  };
+  ec2.deleteNetworkAclEntry(params, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data);  // successful response
+  });
+}
+
+module.exports.blacklistip = function(event,context,response){
+
+  var ip = event.queryStringParameters.ip
+  var accessToken = event.queryStringParameters.accessToken
+
+  //Core logic (No Change)
+  if(accessToken==actoken){
+    if(ip){
+      var timestamp = Math.floor(Date.now()/1000)
+      var expirymin = Math.ceil(timestamp/60) + ruleValidity
+
+      var params = {
+        TableName:  table_name,
+        ProjectionExpression: "id,ip",
+      }
+
+      //Scanning for id's to decide which to use for the rule
+      docClient.scan(params, onScan);
+
+      function onScan (err,data){
+        if(err){
+          console.log(err)
+        }
+        ips = data.Items
+        console.log(ips)
+        iparray = ips.map(function(vals) { return vals.ip })
+        indexvalofip = iparray.indexOf(ip)
+        if(indexvalofip!=-1){
+          var params = {
+              TableName: table_name,
+              Key:{
+                  "id": ips[indexvalofip].id
+              },
+              UpdateExpression: "set expirymin = :expmin",
+              ExpressionAttributeValues:{
+                  ":expmin":expirymin
+              },
+              ReturnValues:"UPDATED_NEW"
+          };
+
+          docClient.update(params, function(err, data) {
+              if (err) {
+                  console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+                  sendResponse(response,200,'error')
+              } else {
+                  console.log("Blocking expiry increased for IP: ", ip);
+                  sendResponse(response,200,'expiryextended')
+              }
+          });
+        }else{
+          if(data.Items.length>=aclLimit){
+            console.log('Rule Limit Reached!')
+            sendResponse(response,500,'rulelimitreached')
+          }else{
+            ids = data.Items
+            ids = ids.map(function(vals) { return vals.id })
+
+            //Checking for missing Id to use in ACL Rule
+            for(var i = ruleStartId; i < ruleStartId + aclLimit ; i++) {
+              if(ids.indexOf(i)==-1) {
+                //Adding to Table
+                var params = {
+                  Item: {
+                    id: i,
+                    expirymin: expirymin,
+                    ip: ip,
+                    timestamp: timestamp,
+                  },
+                  TableName:  table_name
+                }
+                //Adding to ACL
+                console.log('Blocking '+ ip + ' with Rule no: '+ i )
+                docClient.put(params, function(err,data){
+                  if(err){
+                    console.log(err)
+                  }
+                })
+                addACLRule(ip,i)  
+                break;            
+              }
+            }
+            sendResponse(response,200,'blocked')            
+          }
+        }       
+      }  
+    }else{
+      sendResponse(response,400,'badrequest')
+    }
+  }else{
+    sendResponse(response,401,'unauthorized')
+  }
+}//)
+
+module.exports.handleexpiry = handleexpiry
+function handleexpiry (){
+  var expirymin = Math.floor(Date.now()/1000/60)
+  console.log('expirymin:'+expirymin)
+  var params = {
+    TableName:  table_name,
+    ProjectionExpression: "id,ip",
+    IndexName: "expirymin_index",
+    KeyConditionExpression: "expirymin = :expmin",
+    ExpressionAttributeValues: {
+      ":expmin": expirymin
+    }
+  }
+
+  docClient.query(params, function (err,data){
+    if(err){
+      console.log('DBERR:' + err)
+    }else{
+      data.Items.forEach(function(item){
+        // AWS ACL Query
+        var params = {
+          TableName: table_name,
+          Key:{
+            "id":item.id
+          }
+        };
+        // Deleting from DB
+        docClient.delete(params, function(err, data) {
+          if (err) {
+            console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+          } else {
+            // Delete from ACL
+            delACLRule(item.id)
+            console.log("Deleting Blackist Rule for: "+ item.ip)
+          }
+        });
+      })
+    }
+  })
+}

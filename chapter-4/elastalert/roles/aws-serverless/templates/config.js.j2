@@ -1,0 +1,9 @@
+module.exports = {
+	region: "us-east-1",										// AWS Region to deploy in
+	accessToken: "YOUR_R4NDOM_S3CR3T_ACCESS_TOKEN_GOES_HERE",	// Accesstoken to make requests to blacklist
+	aclLimit: 20, 												// Maximum number of acl rules
+	ruleStartId: 10, 											// Starting id for acl entries
+	aclId: "YOUR_ACL_ID", 										// AclId that you want to be managed
+	tableName: "blacklist_ip", 									// DynamoDB table that will be created
+	ruleValidity: 5 											// Validity of Blacklist rule in minutes 
+}

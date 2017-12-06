@@ -1,0 +1,20 @@
+- name: install apache2 server
+  apt:
+    name: apache2
+    state: present
+
+- name: update the apache2 server configuration
+  template: 
+    src: web.conf.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable apache2 on startup
+  service:
+    name: apache2
+    enabled: yes
+
+  notify:
+    - start apache2

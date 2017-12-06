@@ -1,0 +1,20 @@
+- name: adding haproxy repo
+  apt_repository:
+    repo: ppa:vbernat/haproxy-1.7
+
+- name: updating and installing haproxy
+  apt:
+    name: haproxy
+    state: present
+    update_cache: yes
+
+- name: updating the haproxy configuration
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+
+- name: starting the haproxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: yes

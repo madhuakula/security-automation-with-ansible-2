@@ -1,0 +1,10 @@
+- name: configuring filebeat.yml file
+  template:
+    src: "{{ item.src }}"
+    dest: "/etc/filebeat/{{ item.dst }}"
+
+  with_items:
+    - { src: 'filebeat.yml.j2', dst: 'filebeat.yml' }
+
+  notify:
+    - restart filebeat

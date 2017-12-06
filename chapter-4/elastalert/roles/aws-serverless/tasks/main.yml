@@ -1,0 +1,42 @@
+- name: installing node run time and npm
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  
+  with_items:
+    - nodejs
+    - npm
+
+- name: installing serverless package
+  npm:
+    name: "{{ item }}"
+    global: yes
+    state: present
+
+  with_items:
+    - serverless
+    - aws-sdk
+
+- name: copy the setup files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+
+  with_items:
+    - { src: 'config.js.j2', dst: '/opt/serverless/config.js' }
+    - { src: 'handler.js.j2', dst: '/opt/serverless/handler.js' }
+    - { src: 'iamRoleStatements.json.j2', dst: '/opt/serverless/iamRoleStatements.json' }
+    - { src: 'initDb.js.j2', dst: '/opt/serverless/initDb.js' }
+    - { src: 'serverless.yml.j2', dst: '/opt/serverless/serverless.yml' }
+    - { src: 'aws-credentials.j2', dst: '~/.aws/credentials' }
+
+- name: create dynamo db table
+  command: "node initDb.js"
+  args:
+    chdir: /opt/serverless/
+
+- name: deploy the serverless
+  command: "serverless deploy"
+  args:
+    chdir: /opt/serverless/

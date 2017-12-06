@@ -1,0 +1,11 @@
+- name: setting up cuckoo
+  hosts: cuckoo
+  remote_user: ubuntu
+  become: yes
+
+  roles:
+    - dependencies
+    - virtualbox
+    - yara
+    - cuckoo
+    - start-cuckoo

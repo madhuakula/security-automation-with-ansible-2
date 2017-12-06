@@ -1,0 +1,9 @@
+- name: setting up elastalert & automated defence in aws
+  hosts: elastic-stack
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+
+  roles:
+    - setup
+    - aws-serverless

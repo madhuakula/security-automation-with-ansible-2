@@ -1,0 +1,40 @@
+  - name: adding cuckoo to vboxusers
+    group:
+      name: cuckoo
+      state: present
+
+  - name: creating new user and add to groups
+    user:
+      name: cuckoo
+      shell: /bin/bash
+      groups: vboxusers, cuckoo
+      state: present
+      append: yes
+
+  - name: upgrading pip, setuptools and cuckoo
+    pip:
+      name: "{{ item }}"
+      state: latest
+    
+    with_items:
+      - pip
+      - setuptools
+      - pydeep
+      - cuckoo
+      - openpyxl
+      - ujson
+      - pycrypto
+      - distorm3
+      - pytz
+      - weasyprint
+
+  - name: creating cuckoo home direcotry
+    command: "cuckoo"
+    ignore_errors: yes
+
+  - name: adding cuckoo as owner
+    file:
+      path: "/root/.cuckoo"
+      owner: cuckoo
+      group: cuckoo
+      recurse: yes

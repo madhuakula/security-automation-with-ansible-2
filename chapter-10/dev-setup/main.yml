@@ -1,0 +1,29 @@
+- name: Setting Developer Environment
+  hosts: dev
+  remote_user: madhu
+  become: yes
+  vars:
+    ansible_code_path: "/home/madhu/ansible-code"
+
+  tasks:
+    - name: installing prerequirements if not installed
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+    
+      with_items:
+        - git
+        - virtualenv
+        - python-pip
+    
+    - name: downloading ansible repo locally
+      git:
+        repo: https://github.com/ansible/ansible.git
+        dest: "{{ ansible_code_path }}/venv"
+    
+    - name: creating virtual environment
+      pip:
+        virtualenv: "{{ ansible_code_path }}"
+        virtualenv_command: virtualenv
+        requirements: "{{ ansible_code_path }}/venv/requirements.txt"

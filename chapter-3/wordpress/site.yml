@@ -1,0 +1,16 @@
+- name: setting up wordpress stack
+  hosts: wordpress
+  remote_user: "{{ remote_user_name }}"
+  gather_facts: False
+  become: True
+
+  roles:
+    - common
+    - nginx
+    - php-fpm
+    - mysql
+    - mysql-hardening
+    - wordpress
+    - certbot
+    - duply
+    - firewall-setup

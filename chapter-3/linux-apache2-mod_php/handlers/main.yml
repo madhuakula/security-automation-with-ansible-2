@@ -1,0 +1,20 @@
+# handlers file for linux-apache2-mod_php
+- name: start apache2
+  service:
+    name: apache2
+    state: started
+
+- name: enable apache2
+  service:
+    name: apache2
+    enabled: yes
+
+- name: stop apache2
+  service:
+    name: apache2
+    state: stopped
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted

@@ -1,0 +1,50 @@
+- name: working with nessus rest api
+  connection: local
+  hosts: localhost
+  gather_facts: no
+  vars:
+    scan_id: 17
+    nessus_access_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    nessus_secret_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    nessus_url: https://192.168.33.109:8834
+    nessus_report_format: html
+
+  tasks:
+    - name: export the report for given scan "{{ scan_id }}"
+      uri:
+        url: "{{ nessus_url }}/scans/{{ scan_id }}/export"
+        method: POST
+        validate_certs: no
+        headers:
+          X-ApiKeys: "accessKey={{ nessus_access_key }}; secretKey={{ nessus_secret_key }}"
+        body: "format={{ nessus_report_format }}&chapters=vuln_by_host;remediations"
+      register: export_request
+
+    - debug:
+        msg: "File id is {{ export_request.json.file }} and scan id is {{ scan_id }}"
+
+    - name: check the report status for "{{ export_request.json.file }}"
+      uri:
+        url: "{{ nessus_url }}/scans/{{ scan_id }}/export/{{ export_request.json.file }}/status"
+        method: GET
+        validate_certs: no
+        headers:
+          X-ApiKeys: "accessKey={{ nessus_access_key }}; secretKey={{ nessus_secret_key }}"
+      register: report_status
+
+    - debug:
+        msg: "Report status is {{ report_status.json.status }}"
+
+    - name: downloading the report locally
+      uri:
+        url: "{{ nessus_url }}/scans/{{ scan_id }}/export/{{ export_request.json.file }}/download"
+        method: GET
+        validate_certs: no
+        headers:
+          X-ApiKeys: "accessKey={{ nessus_access_key }}; secretKey={{ nessus_secret_key }}"
+        return_content: yes
+        dest: "./{{ scan_id }}_{{ export_request.json.file }}.{{ nessus_report_format }}"
+      register: report_output
+
+    - debug:
+        msg: "Report can be found at ./{{ scan_id }}_{{ export_request.json.file }}.{{ nessus_report_format }}"

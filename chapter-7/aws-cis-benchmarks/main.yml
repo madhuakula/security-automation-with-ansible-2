@@ -1,0 +1,31 @@
+- name: AWS CIS Benchmarks playbook
+  hosts: localhost
+  become: yes
+  vars:
+    aws_access_key: XXXXXXXX
+    aws_secret_key: XXXXXXXX
+  
+  tasks:
+    - name: installing aws cli and ansi2html
+      pip:
+        name: "{{ item }}"
+      
+      with_items:
+        - awscli
+        - ansi2html
+    
+    - name: downloading and setting up prowler
+      get_url:
+        url: https://raw.githubusercontent.com/Alfresco/prowler/master/prowler
+        dest: /usr/bin/prowler
+        mode: 0755
+      
+    - name: running prowler full scan
+      shell: "prowler | ansi2html -la > ./aws-cis-report-{{ ansible_date_time.epoch }}.html"
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+    
+    - name: AWS CIS Benchmarks report downloaded
+      debug:
+        msg: "Report can be found at ./aws-cis-report-{{ ansible_date_time.epoch }}.html"

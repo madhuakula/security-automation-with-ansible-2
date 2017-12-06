@@ -1,0 +1,2 @@
+server_admin_email: "hodor@localhost.local"
+server_document_root: "/var/www/html"

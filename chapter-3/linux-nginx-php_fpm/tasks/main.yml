@@ -1,0 +1,38 @@
+# tasks file for linux-nginx-php_fpm
+- name: installing nginx and php-fpm
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items:
+    - nginx
+    - php5-fpm
+    - php5
+    - php5-mysql
+    - php5-mcrypt
+    - php5-gd
+
+- name: configuring php.ini for php processor
+  lineinfile:
+    path: /etc/php5/fpm/php.ini
+    line: "cgi.fix_pathinfo=0"
+
+- name: update the nginx configuration to support php-fpm
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+
+  with_items:
+    - { src: "default.conf.j2", dest: "/etc/nginx/conf.d/default.conf" }
+
+- name: enable and start php5-fpm on startup
+  service:
+    name: php5-fpm
+    enabled: yes
+    state: restarted
+
+- name: enable and start nginx on startup
+  service:
+    name: nginx
+    enabled: yes
+    state: restarted

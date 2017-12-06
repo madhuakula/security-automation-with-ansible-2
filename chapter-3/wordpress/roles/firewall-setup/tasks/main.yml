@@ -1,0 +1,39 @@
+- name: installing ufw package
+  apt:
+    name: "ufw"
+    update_cache: yes
+    state: present
+
+- name: enable ufw logging
+  ufw:
+    logging: on
+
+- name: default ufw setting
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+
+  with_items:
+    - { direction: 'incoming', policy: 'deny' }
+    - { direction: 'outgoing', policy: 'allow' }
+
+- name: allow required ports to access server
+  ufw:
+    rule: "{{ item.policy }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.protocol }}"
+
+  with_items:
+    - { port: "22", protocol: "tcp", policy: "allow" }
+    - { port: "80", protocol: "tcp", policy: "allow" }
+    - { port: "443", protocol: "tcp", policy: "allow" }
+
+- name: enable ufw
+  ufw:
+    state: enabled
+
+- name: restart ufw and add to start up programs
+  service:
+    name: ufw
+    state: restarted
+    enabled: yes

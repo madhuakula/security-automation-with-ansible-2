@@ -1,0 +1,16 @@
+- name: downloading the release
+  unarchive:
+    src: https://github.com/viper-framework/viper/archive/v1.2.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: installing pip dependencies
+  pip:
+    requirements: /opt/viper-1.2/requirements.txt
+
+- name: starting viper webinterface
+  shell: nohup /usr/bin/python /opt/viper-1.2/web.py -H 0.0.0.0 &
+  ignore_errors: yes
+
+- debug:
+    msg: "Viper web interface is running at http://{{ inventory_hostname }}:9090"

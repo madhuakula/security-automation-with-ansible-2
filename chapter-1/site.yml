@@ -1,0 +1,11 @@
+- name: lamp stack setup on ubuntu 16.04
+  hosts: lamp
+  gather_facts: False
+  remote_user: "{{ remote_username }}"
+  become: yes
+
+  roles:
+    - common
+    - web
+    - db
+    - php

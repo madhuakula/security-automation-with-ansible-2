@@ -1,0 +1,10 @@
+- name: configuring metricbeat.yml file
+  template:
+    src: "{{ item.src }}"
+    dest: "/etc/metricbeat/{{ item.dst }}"
+    
+  with_items:
+    - { src: 'metricbeat.yml.j2', dst: 'metricbeat.yml' }
+
+  notify:
+    - restart metricbeat

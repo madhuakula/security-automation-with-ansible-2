@@ -1,0 +1,2 @@
+[cuckoo]
+192.168.33.132 ansible_host=192.168.33.132 ansible_user=ubuntu ansible_password=vagrant

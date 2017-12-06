@@ -1,0 +1,2 @@
+[mysql]
+192.168.33.22 ansible_host=192.168.33.22 ansible_user=ubuntu ansible_password=vagrant

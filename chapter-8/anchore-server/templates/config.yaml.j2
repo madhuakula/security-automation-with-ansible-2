@@ -1,0 +1,135 @@
+# Anchore Service Configuration File
+#
+
+# General system-wide configuration options, these should not need to
+# be altered for basic operation
+#
+# service_dir: '/config'
+# tmp_dir: '/tmp'
+# log_level: 'DEBUG'
+#
+# allow_awsecr_iam_auto: False
+cleanup_images: True
+# docker_conn: 'unix://var/run/docker.sock'
+# docker_conn_timeout: 600
+#
+#
+log_level: 'DEBUG'
+host_id: 'dockerhostid-xyz'
+internal_ssl_verify: False
+#catalog_endpoint: 'http://localhost:8082/v1'
+#
+
+# Uncomment if you have a local endpoint that can accept
+# notifications from the anchore-engine, as configured below
+#
+#webhooks:
+#  webhook_user: 'user'
+#  webhook_pass: 'pass'
+#  ssl_verify: False
+#  general:
+#    url: 'http://localhost:9090/general/<notification_type>/<userId>'
+#  policy_eval:
+#    url: 'http://localhost:9090/policy_eval/<userId>'
+#    webhook_user: 'mehuser'
+#    webhook_pass: 'mehpass'
+## special webhook for FATAL service events - system will store in DB if not enabled here
+#  # error_event:
+#  #   url: 'http://localhost:9090/error_event/'
+#  #
+
+#
+# A feeds section is available for override, but shouldn't be
+# needed. By default, the 'admin' credentials are used if present,
+# otherwise anonymous access for feed sync is used
+
+#feeds:
+#  selective_sync:
+#    # If enabled only sync specific feeds instead of all.
+#    enabled: True
+#    feeds:
+#      vulnerabilities: True
+#      # Warning: enabling the package sync causes the service to require much
+#      #   more memory to do process the significant data volume. We recommend at least 4GB available for the container
+#      packages: False
+#  anonymous_user_username: anon@ancho.re
+#  anonymous_user_password: pbiU2RYZ2XrmYQ
+#  url: 'https://ancho.re/v1/service/feeds'
+#  client_url: 'https://ancho.re/v1/account/users'
+#  token_url: 'https://ancho.re/oauth/token'
+#  connection_timeout_seconds: 3
+#  read_timeout_seconds: 60
+
+credentials:
+  users:
+     admin:
+       password: "{{ admin_password }}"
+       email: 'admin@localhost.local'
+       external_service_auths:
+       #  anchoreio:
+       #    anchorecli:
+       #      auth: 'myanchoreiouser:myanchoreiopass'
+       #auto_policy_sync: True
+
+  database:
+    db_connect: "postgresql+pg8000://postgres:{{ db_password }}@anchore-db:5432/postgres"
+    db_connect_args:
+      timeout: 120
+      ssl: False
+    db_pool_size: 30
+    db_pool_max_overflow: 100
+
+services:
+  apiext:
+    enabled: True
+    require_auth: True
+    endpoint_hostname: 'localhost'
+    listen: '0.0.0.0'
+    port: 8228
+    #ssl_enable: True
+    #ssl_cert: '/config/selfsigned-example.cert'
+    #ssl_key: '/config/selfsigned-example.key'
+  kubernetes_webhook:
+    enabled: True
+    require_auth: False
+    endpoint_hostname: 'localhost'
+    listen: '0.0.0.0'
+    port: 8338
+    #ssl_enable: True
+    #ssl_cert: '/config/selfsigned-example.cert'
+    #ssl_key: '/config/selfsigned-example.key'
+  catalog:
+    enabled: True
+    require_auth: True
+    endpoint_hostname: 'localhost'
+    listen: '0.0.0.0'
+    port: 8082
+    use_db: True
+    cycle_timer_seconds: '1'
+    cycle_timers:
+      image_watcher: 3600
+      policy_eval: 3600
+      feed_sync: 14400
+      analyzer_queue: 1
+      notifications: 30
+      service_watcher: 15
+      policy_bundle_sync: 300
+  simplequeue:
+    enabled: True
+    require_auth: True
+    endpoint_hostname: 'localhost'
+    listen: '0.0.0.0'
+    port: 8083
+  analyzer:
+    enabled: True
+    cycle_timer_seconds: '1'
+    max_threads: '1'
+  policy_engine:
+    enabled: True
+    require_auth: True
+    endpoint_hostname: 'localhost'
+    listen: '0.0.0.0'
+    port: 8087
+    #ssl_enable: True
+    #ssl_cert: '/config/selfsigned-example.cert'
+    #ssl_key: '/config/selfsigned-example.key'

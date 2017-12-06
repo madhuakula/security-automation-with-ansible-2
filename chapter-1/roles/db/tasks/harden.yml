@@ -1,0 +1,35 @@
+- name: deletes anonymous mysql user
+  mysql_user:
+    user: ""
+    state: absent
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+- name: secures the mysql root user
+  mysql_user: 
+    user: root
+    password: "{{ mysql_root_password }}"
+    host: "{{ item }}"
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+  with_items:
+    - 127.0.0.1
+    - localhost
+    - ::1
+    - "{{ ansible_fqdn }}"
+
+- name: removes the mysql test database
+  mysql_db:
+    db: test
+    state: absent
+    login_password: "{{ mysql_root_password }}"
+    login_user: root
+
+- name: enable mysql on startup
+  service:
+    name: mysql
+    enabled: yes
+
+  notify:
+    - start mysql

@@ -1,0 +1,34 @@
+- name: setting up VirusTotal
+  hosts: malware
+  remote_user: ubuntu
+  become: yes
+  
+  tasks:
+    - name: installing pip
+      apt:
+        name: "{{ item }}"
+        
+      with_items:
+        - python-pip
+        - unzip
+    
+    - name: checking if vt already exists
+      stat:
+        path: /usr/local/bin/vt
+      register: vt_status
+
+    - name: downloading VirusTotal api tool repo
+      unarchive:
+        src: "https://github.com/doomedraven/VirusTotalApi/archive/master.zip"
+        dest: /tmp/
+        remote_src: yes
+      when: vt_status.stat.exists == False 
+
+    - name: installing the dependencies
+      pip:
+        requirements: /tmp/VirusTotalApi-master/requirements.txt
+      when: vt_status.stat.exists == False       
+    
+    - name: installing vt
+      command: python /tmp/VirusTotalApi-master/setup.py install
+      when: vt_status.stat.exists == False

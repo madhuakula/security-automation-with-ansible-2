@@ -1,0 +1,39 @@
+- name: installing required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  
+  with_items:
+    - gcc
+    - python-dev
+    - python-pip
+    - libssl-dev
+    - swig
+
+- name: downloading ssdeep release
+  unarchive:
+    src: https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: copy ssdeep setup script
+  template:
+    src: ssdeep.sh
+    dest: /tmp/ssdeep.sh
+    mode: 0755
+
+- name: installing ssdeep
+  shell: /tmp/ssdeep.sh
+  ignore_errors: yes
+
+- name: installing core dependencies
+  pip:
+    name: "{{ item }}"
+    state: present
+  
+  with_items:
+    - SQLAlchemy
+    - PrettyTable
+    - python-magic
+    - pydeep

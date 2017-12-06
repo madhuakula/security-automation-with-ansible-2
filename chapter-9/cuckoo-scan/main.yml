@@ -1,0 +1,14 @@
+- name: Cuckoo malware sample analysis
+  hosts: cuckoo
+  vars:
+    local_binaries_path: /tmp/binaries
+
+  tasks:
+    - name: copying malware sample to cuckoo for analysis
+      copy:
+        src: "{{ local_binaries_path }}"
+        dest: "/tmp/binaries/{{ ansible_hostname }}"
+    
+    - name: submitting the files to cuckoo for analysis
+      command: "cuckoo submit /tmp/binaries/{{ ansible_hostname }}"
+      ignore_errors: yes

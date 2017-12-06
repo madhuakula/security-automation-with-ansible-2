@@ -1,0 +1,17 @@
+- name: Updating to GREEN deployment
+  hosts: proxyserver
+  become: yes 
+  
+  tasks:
+    - name: updating proxy configuration
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+    
+    - name: updating the service
+      service:
+        name: haproxy
+        state: reloaded
+
+    - debug:
+        msg: "GREEN deployment successful. Please check your server :)"

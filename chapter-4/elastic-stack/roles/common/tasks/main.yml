@@ -1,0 +1,29 @@
+- name: install python 2
+  raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+  
+- name: accepting oracle java license agreement
+  debconf:
+    name: 'oracle-java8-installer'
+    question: 'shared/accepted-oracle-license-v1-1'
+    value: 'true'
+    vtype: 'select'
+
+- name: adding ppa repo for oracle java by webupd8team
+  apt_repository:
+    repo: 'ppa:webupd8team/java'
+    state: present
+    update_cache: yes
+
+- name: installing java nginx apache2-utils and git
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - python-software-properties
+    - oracle-java8-installer
+    - nginx
+    - apache2-utils
+    - python-pip
+    - python-passlib

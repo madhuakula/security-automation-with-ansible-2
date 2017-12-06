@@ -1,0 +1,13 @@
+# In ubuntu 16.04 by default there is no python2
+- name: install python 2
+  raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- name: install curl and git
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+
+  with_items:
+    - curl
+    - git

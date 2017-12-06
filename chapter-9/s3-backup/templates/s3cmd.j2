@@ -1,0 +1,8 @@
+[default]
+access_key = {{ s3_access_key }}
+secret_key = {{ s3_access_secret }}
+host_base = s3.amazonaws.com
+host_bucket = %(bucket)s.s3.amazonaws.com
+website_endpoint = http://%(bucket)s.s3-website-%(location)s.amazonaws.com/
+use_https = True
+signature_v2 = True

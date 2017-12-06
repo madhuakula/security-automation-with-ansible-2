@@ -1,0 +1,17 @@
+- name: AWS Security Audit using Scout2
+  hosts: localhost
+  vars:
+    aws_access_key: XXXXXXXX
+    aws_secret_key: XXXXXXXX
+  
+  tasks:
+    - name: running scout2 scan
+      # If you are performing from less memory system add --thread-config 1 to below command
+      command: "Scout2"
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+    
+    - name: AWS Scout2 report downloaded
+      debug:
+        msg: "Report can be found at ./scout2-report/report.html"

@@ -1,0 +1,41 @@
+- name: Nikto Playbook
+  hosts: scanner
+  remote_user: ubuntu
+  become: yes
+  vars:
+    domain_name: idontexistdomainnamewebsite.com # Add the domain to scan
+    report_name: report.html
+  
+  tasks:
+    - name: installing pre requisuites
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+
+      with_items:
+        - git
+        - perl
+        - libnet-ssleay-perl
+        - openssl
+        - libauthen-pam-perl
+        - libio-pty-perl
+        - libmd-dev
+ 
+    - name: downloading nikto
+      git:
+        repo: https://github.com/sullo/nikto.git
+        dest: /usr/share/nikto/
+
+    - name: Nikto scanning in action
+      # Output available in csv, html, msf+, nbe, txt, xml  formats
+      command: "/usr/share/nikto/program/nikto.pl -h {{ domain_name }} -o /tmp/{{ domain_name }}-report.html"
+    
+    - name: downloading the report
+      fetch:
+        src: "/tmp/{{ domain_name }}-report.html"
+        dest: "{{ report_name }}"
+        flat: yes
+
+    - debug:
+        msg: "Report can be found at {{ report_name }}"
