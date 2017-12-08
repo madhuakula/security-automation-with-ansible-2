@@ -18,7 +18,8 @@
         - pyyaml
     
     - name: downloading image
-      command: "docker pull {{ scan_image_name }}"
+      docker_image:
+        name: "{{ scan_image_name }}"
 
     - name: adding image for analysis
       command: "anchore-cli image add {{ scan_image_name }}"
