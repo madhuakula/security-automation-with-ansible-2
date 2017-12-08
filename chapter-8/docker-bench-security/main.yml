@@ -15,16 +15,16 @@
         dest: /opt/docker-bench-security
     
     - name: running docker-bench-security scan
-      command: sh docker-bench-security.sh -l /tmp/output.log
+      command: docker-bench-security.sh -l /tmp/output.log
       args:
         chdir: /opt/docker-bench-security/
     
     - name: downloading report locally
       fetch:
         src: /tmp/output.log
-        dest: ./{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log
+        dest: "{{ playbook_dir }}/{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log"
         flat: yes
 
     - name: report location
       debug:
-        msg: "Report can be found at ./{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log"
+        msg: "Report can be found at {{ playbook_dir }}/{{ inventory_hostname }}-docker-report-{{ ansible_date_time.date }}.log"
