@@ -21,5 +21,5 @@
     - name: downloading the report locally
       fetch:
         src: /tmp/{{ image_to_scan }}-scan-report.json
-        dest: ./{{ image_to_scan }}-scan-report.json
+        dest: {{ playbook_dir }}/{{ image_to_scan }}-scan-report.json
         flat: yes
