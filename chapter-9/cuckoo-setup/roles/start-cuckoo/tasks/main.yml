@@ -15,6 +15,6 @@
 
 - name: starting cuckoo webserver
   command: "cuckoo web runserver 0.0.0.0:8000"
-    args:
-      chdir: "/root/.cuckoo/web"
+  args:
+    chdir: "/root/.cuckoo/web"
   ignore_errors: yes
