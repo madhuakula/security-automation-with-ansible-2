@@ -4,11 +4,11 @@ This repository contains all the code, playbooks, details regarding the book on 
 
 ## Index
 
-### Part-1
+### Part-1: Essential Ansible for building complex playbooks
 -  Introduction to Ansible Playbooks and Roles
 -  Ansible Tower, Jenkins and other automation tools
 
-### Part-2
+### Part-2: Security automation techniques and approaches
 -  Setting up a hardened WordPress with encrypted automated backups
 -  Log monitoring and server-less automated defense (ELK in AWS)
 -  Automated Web Application Security Testing using OWASP ZAP
@@ -17,6 +17,6 @@ This repository contains all the code, playbooks, details regarding the book on 
 -  Continuous security scanning for Docker containers
 -  Automating lab setups for forensics collection, malware analysis
 
-### Part-3
+### Part-3: Extending and programming Ansible for even more security
 - Writing an Ansible module for security testing
 - Ansible security best practices, references and further reading
